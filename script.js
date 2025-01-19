@@ -1,39 +1,63 @@
-function generatepassword(length){
-    const lower_case = "qwertyuiopasdfghjklzxcvbnm";
-    const upper_case = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    const specail = "!@#$%^&*()_+~`=?></\|";
-    const number = "1234567890";
 
+function generatepassword(totallength,numLetters,numNumbers,numSpecial){
+
+const lower_case = "qwertyuiopasdfghjklzxcvbnm";
+const upper_case = "QWERTYUIOPASDFGHJKLZXCVBNM";
+const specail = "!@#$%^&*()_+~`=?></\|";
+const numbers = "1234567890";
 
 let password = "";
-
-for(let i = 0; i < length; i++){
-    const rand = Math.floor(Math.random()* 4);
-    switch(rand){
-        case 0:
-            password += lower_case.charAt(Math.floor(Math.random() * lower_case.length));
-            break;
-        case 1:
-            password += upper_case.charAt(Math.floor(Math.random() * upper_case.length));
-            break;
-        case 2:
-            password += specail.charAt(Math.floor(Math.random() * specail.length));
-            break;
-        case 3:
-            password += number.charAt(Math.floor(Math.random() * number.length));
-            break;
+let reminaingLength = totallength;
+const getRandomChars = (source,count) =>{
+    let chars = "";
+    for(let i = 0; i < count;i++){
+        chars += source.charAt(Math.floor(Math.random() * source.length));
     }
+    return chars;
 }
-return password;
+
+const nums = getRandomChars(numbers,numNumbers);
+password += nums;
+reminaingLength -= numNumbers;
+
+const specials = getRandomChars(specail,numSpecial);
+password += specials;
+reminaingLength -= numSpecial;
+
+const letters = getRandomChars(lower_case + upper_case + numLetters);
+password += letters;
+reminaingLength -= numLetters;
+
+if(reminaingLength > 0){
+    const allChars = lower_case + upper_case + specail + numbers;
+    password += getRandomChars(allChars,reminaingLength);
+
 }
-document.getElementById("create_button").addEventListener("click" , () =>{
-    const length = document.getElementById("length").value;
-    if(length < 1 || length > 99){
-        alert("Enter the valid digit between 1 to 99");
+    return password.split("").sort(() => Math.random() - 0.5).join("");
+}
+
+document.getElementById("create_button").addEventListener("click",() =>{
+    const totallength = parseInt(document.getElementById("totallength").value);
+    const numLetters = parseInt(document.getElementById("letters").value);
+    const numNumbers = parseInt(document.getElementById("numbers").value);
+    const numSpecial = parseInt(document.getElementById("specialChars").value);
+
+    if(isNaN(totallength) || isNaN(numLetters) || isNaN(numNumbers) || isNaN(numSpecial)){
+        alert("Please write valid numbers");
         return;
     }
-    const password = generatepassword(length);
-    document.getElementById("password").value = password;
 
-}
-);
+    if(numLetters + numNumbers + numSpecial > totallength){
+        alert("The sum of critrie is greater than total charactors , please enter correctly ")
+        return;
+    }
+
+    if(totallength < 1 || totallength > 99){
+        alert("Total length must be between1 to 99");
+        return;
+    }
+
+    const password = generatepassword(totallength,numLetters,numNumbers,numSpecial);
+    document.getElementById("password").value = password;
+    
+});
